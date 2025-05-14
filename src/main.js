@@ -50,45 +50,39 @@ sneakersArray.forEach((sneaker) => {
 // filtros
 populateFilterOptions('brand', brandOptions)
 populateFilterOptions('color', colorOptions)
+//limpiar filtros
+const clearFilterButton = document.getElementById('clearFilter')
+if (clearFilterButton) {
+  clearFilterButton.addEventListener('click', () => {
+    const brandSelect = document.getElementById('brand')
+    const colorSelect = document.getElementById('color')
 
+    if (brandSelect) brandSelect.value = ''
+    if (colorSelect) colorSelect.value = ''
+
+    renderProducts(sneakersArray)
+  })
+}
 //modal nav
 document.addEventListener('DOMContentLoaded', () => {
   const modalArrow = document.getElementById('modalArrow')
   const filtersContainer = document.querySelector('.filtersContainer')
+  const sidebar = document.querySelector('.sidebarClass')
+  console.log(sidebar)
 
   if (modalArrow && filtersContainer) {
     modalArrow.addEventListener('click', () => {
       filtersContainer.classList.toggle('hidden')
     })
   }
-})
-//modal nav @media 768px
-document.addEventListener('DOMContentLoaded', () => {
-  const modalArrow = document.getElementById('modalArrow')
-  const sidebar = document.querySelector('.sidebarClass')
-
-  // Alternar la visibilitat del sidebar
   function toggleSidebar() {
     sidebar.classList.toggle('visible')
   }
 
-  // Configurar el comportament segons l'amplada de la pantalla
-  /*  function handleSidebarToggle() {
-    if (window.innerWidth <= 768) {
-      // Assegurar que l'event listener estigui assignat
-      modalArrow.addEventListener('click', toggleSidebar)
-    } else {
-      // Eliminar el listener i ocultar el sidebar si cal
-      modalArrow.removeEventListener('click', toggleSidebar)
-      sidebar.classList.remove('visible') // Assegurar que el sidebar estigui amagat
-    }
-  } */
-
-  // Cridar la funció inicialment per configurar el comportament
-  handleSidebarToggle()
-
-  // Reassignar el comportament en redimensionar la pantalla
-  window.addEventListener('resize', handleSidebarToggle)
+  if (sidebar) {
+    toggleSidebar()
+    window.addEventListener('resize', toggleSidebar)
+  }
 })
 
 //banner
@@ -118,18 +112,38 @@ renderBanners(banners)
 const productsSection = document.createElement('section')
 productsSection.classList.add('productContainerClass')
 
+const noResultsMessage = document.createElement('div')
+noResultsMessage.classList.add('noResultsMessage')
+noResultsMessage.innerHTML =
+  '<p>No se han encontrado coincidencias. Aquí tienes algunas sugerencias:</p>'
+noResultsMessage.style.display = 'none'
+mainSection.appendChild(noResultsMessage)
+
 function renderProducts(productsArray) {
   productsSection.innerHTML = ''
 
   if (productsArray.length === 0) {
-    productsSection.innerHTML =
-      '<p>No hay productos que coincidan con la búsqueda.</p>'
-    return
+    const randomIndices = new Set()
+    while (randomIndices.size < 3) {
+      const randomIndex = Math.floor(Math.random() * sneakersArray.length)
+      randomIndices.add(randomIndex)
+    }
+    const randomProductsArray = Array.from(randomIndices).map(
+      (index) => sneakersArray[index]
+    )
+
+    // Mostrar el mensaje de "No se han encontrado coincidencias"
+    noResultsMessage.style.display = 'block'
+    productsArray = randomProductsArray
+  } else {
+    // Ocultar el mensaje si hay productos
+    noResultsMessage.style.display = 'none'
   }
 
   productsArray.forEach((product) => {
     const productCard = document.createElement('div')
     productCard.classList.add('card')
+
     productCard.innerHTML = `
       <img src="${product.url}" alt="${product.marca}" class="card-image" />
       <div class="cardTextContainer">
@@ -142,6 +156,26 @@ function renderProducts(productsArray) {
       </div>
     `
     productsSection.appendChild(productCard)
+  })
+}
+
+const filterButton = document.getElementById('filter')
+if (filterButton) {
+  filterButton.addEventListener('click', () => {
+    const selectedColor = document.getElementById('color')?.value || ''
+    const selectedBrand = document.getElementById('brand')?.value || ''
+
+    console.log('Color seleccionado:', selectedColor)
+    console.log('Marca seleccionada:', selectedBrand)
+
+    const filteredSneakers = sneakersArray.filter((sneaker) => {
+      const colorMatch = !selectedColor || sneaker.color === selectedColor
+      const brandMatch = !selectedBrand || sneaker.marca === selectedBrand
+      return colorMatch && brandMatch
+    })
+
+    console.log('Productos filtrados:', filteredSneakers)
+    renderProducts(filteredSneakers)
   })
 }
 
@@ -167,18 +201,3 @@ renderFooter(footerData)
 document.body.appendChild(footerSection)
 
 //filtrado
-const filterButton = document.getElementById('filter')
-if (filterButton) {
-  filterButton.addEventListener('click', () => {
-    const selectedColor = document.getElementById('color')?.value || ''
-    const selectedBrand = document.getElementById('brand')?.value || ''
-
-    const filteredSneakers = sneakersArray.filter((sneaker) => {
-      const colorMatch = !selectedColor || sneaker.color === selectedColor
-      const brandMatch = !selectedBrand || sneaker.marca === selectedBrand
-      return colorMatch && brandMatch
-    })
-
-    renderProducts(filteredSneakers)
-  })
-}

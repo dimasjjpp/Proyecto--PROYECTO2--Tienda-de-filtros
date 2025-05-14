@@ -15,12 +15,16 @@ export const sidebarContent = `
     </select>
   </div>
   <div class="filterButtonContainer">
- <button id="filter">Filtrar</button>
+    <button id="filter">Filtrar</button>
   </div>
+  <div class="clearFilterContainer">
+    <button id="clearFilter">Limpiar</button>
   </div>
-  <div id="modalArrow">
-    <img
-      src="./public/resources/icons8-arrow-down-100.png"
-      alt="modalArrowIcon" />
-  </div>
+</div>
+<div id="modalArrow">
+  <img
+    src="./public/resources/icons8-arrow-down-100.png"
+    alt="modalArrowIcon" />
+</div>
+
 `
